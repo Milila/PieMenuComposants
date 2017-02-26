@@ -14,7 +14,7 @@ import java.beans.PropertyChangeSupport;
  *
  * @author cannacan
  */
-public class Item {
+public class ItemPieMenu {
     
     
     //IL MANQUE LES ACTIONS ASSOCIEES A CHAQUE ITEM!!!
@@ -27,8 +27,9 @@ public class Item {
     private String text;
     private Color background;
     private Color foreground;
+    private int angle;
     
-    public Item (String t, Color b, Color f){
+    public ItemPieMenu (String t, Color b, Color f){
         this.text = t;
         this.background = b;
         this.foreground = f;
@@ -80,6 +81,14 @@ public class Item {
     }
     public Color getForeground(){
         return this.foreground;
+    }
+    
+    public int getAngle() {
+        return angle;
+    }
+
+    public void setAngle(int angle) {
+        this.angle = angle;
     }
     
     public void privateAddPropertyChange (String propertyName, PropertyChangeListener listener){

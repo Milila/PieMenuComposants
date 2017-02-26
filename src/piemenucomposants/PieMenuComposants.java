@@ -5,6 +5,12 @@
  */
 package piemenucomposants;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+
 /**
  *
  * @author cannacan
@@ -15,7 +21,9 @@ public class PieMenuComposants {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        FrameTest test = new FrameTest();
+        test.setVisible(true);
+
     }
     
 }
