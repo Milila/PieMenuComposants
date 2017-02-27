@@ -19,7 +19,7 @@ import javax.swing.JComponent;
  */
 public class PieMenu2 extends JComponent {
 
-    private List<Item> listeItem = new ArrayList<Item>();
+    private List<ItemPieMenu> listeItem = new ArrayList<ItemPieMenu>();
     private final static int MIN_ITEM = 1;
     private final static int MAX_ITEM = 8;
     private final static int START_ANGLE = 0;
@@ -40,7 +40,7 @@ public class PieMenu2 extends JComponent {
         if (listeItem.size() > 0) {
             int angle = END_ANGLE / listeItem.size();
             for (int cpt = 0; cpt < listeItem.size(); cpt++) {
-                Item item = listeItem.get(cpt);
+                ItemPieMenu item = listeItem.get(cpt);
                 //System.out.println(cpt + " " + item.getText() + " " + getX() + " " + getY() + " " + (START_ANGLE + cpt * angle) + " " + angle);
                 
                 
@@ -74,7 +74,7 @@ public class PieMenu2 extends JComponent {
         g2.drawString("Supprimer", xDep + 15, yDep + 40 + withPie / 2);
         g2.drawString("Modifier", xDep + 10 + withPie / 2, yDep + 40 + withPie / 2);
      */
-    public Item addItem(Item item) {
+    public ItemPieMenu addItem(ItemPieMenu item) {
         if (listeItem.size() <= MAX_ITEM) {
             listeItem.add(item);
             return item;
@@ -83,7 +83,7 @@ public class PieMenu2 extends JComponent {
         }
     }
 
-    public Item remove(Item item) {
+    public ItemPieMenu remove(ItemPieMenu item) {
         if (listeItem.size() > MIN_ITEM) {
             listeItem.remove(item);
             return item;

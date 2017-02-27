@@ -89,7 +89,7 @@ public class FrameTest extends javax.swing.JFrame {
     }//GEN-LAST:event_formMousePressed
 
     private void formMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseMoved
-        pieMenu.highlightQuartier(evt.getX(), evt.getY());
+       // pieMenu.highlightQuartier(evt.getX(), evt.getY());
     }//GEN-LAST:event_formMouseMoved
 
     /**

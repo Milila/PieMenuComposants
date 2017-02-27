@@ -11,9 +11,16 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.List;
 import java.util.ArrayList;
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
@@ -21,8 +28,11 @@ import javax.swing.PopupFactory;
  *
  * @author cannacan
  */
-public class PieMenu extends JComponent {
+public class PieMenu extends JLayeredPane {
 
+    // private static final String PROPERTY_QUATIER_BACKGROUND_COLOR = "quartierbackgroundcolor";
+    private static final String PROPERTY_NB_QUATIER = "nombrequartier";
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private ArrayList<ItemPieMenu> items;
     private int xDep;
     private int yDep;
@@ -31,11 +41,41 @@ public class PieMenu extends JComponent {
     private int heigthPie;
 
     public PieMenu() {
+        super();
         items = new ArrayList<ItemPieMenu>();
         xDep = 100;
         yDep = 100;
         widthPie = 150;
         heigthPie = 150;
+        this.setBackground(Color.red);
+        /* this.privateaddPropertyChangeListener(PROPERTY_QUATIER_BACKGROUND_COLOR, (e)-> {
+            firePropertyChange(PROPERTY_QUATIER_BACKGROUND_COLOR, e.getOldValue(), e.getNewValue()); 
+        });*/
+        this.privateaddPropertyChangeListener(PROPERTY_NB_QUATIER, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                // List<ItemPieMenu> items = (List) evt.getNewValue();
+                int angle = 360 / items.size();
+                //Pour palier au probleme du nombre d'items impairs
+                if (360 % items.size() != 0) {
+                    angle++;
+                }
+                int i = 0;
+                for (ItemPieMenu it : items) {
+                    it.setAngle(angle);
+                    it.setNum_quartier(i);
+                    it.setHeigthPie(heigthPie);
+                    it.setWidthPie(widthPie);
+                    addItemInComponent(it);
+                    i++;
+                }
+                repaint();
+            }
+        });
+    }
+
+    private void addItemInComponent(ItemPieMenu item) {
+        this.add(item, item.getNum_quartier());
     }
 
     public List getItems() {
@@ -43,12 +83,15 @@ public class PieMenu extends JComponent {
     }
 
     public void setItems(ArrayList items) {
+        List<ItemPieMenu> oldItems = this.items;
         this.items = items;
+        support.firePropertyChange(PROPERTY_NB_QUATIER, oldItems, this.items);
     }
 
     public void addItem(ItemPieMenu i) {
         items.add(i);
-        invalidate();
+        //invalidate();
+        support.firePropertyChange(PROPERTY_NB_QUATIER, null, this.items);
     }
 
     public int getxDep() {
@@ -67,7 +110,7 @@ public class PieMenu extends JComponent {
         this.yDep = yDep;
     }
 
-    public int getWidthPie() {
+    /*    public int getWidthPie() {
         return widthPie;
     }
 
@@ -82,19 +125,19 @@ public class PieMenu extends JComponent {
     public void setHeigthPie(int heigthPie) {
         this.heigthPie = heigthPie;
     }
-
-    public void highlightQuartier(int x, int y) {
+     */
+ /*   public void highlightQuartier(int x, int y) {
         System.out.println("x : " + xDep + "  y : " + yDep);
         Graphics2D g2 = (Graphics2D) getGraphics();
-        int r = widthPie/2;
-        double n = Math.sqrt((double)((x - r) * (x - r) + (y - r) * (y - r)));
-        double sinTheta = (y - r)/n;
-        double cosTheta = (x - r)/n;
+        int r = widthPie / 2;
+        double n = Math.sqrt((double) ((x - r) * (x - r) + (y - r) * (y - r)));
+        double sinTheta = (y - r) / n;
+        double cosTheta = (x - r) / n;
         double arcSin = Math.asin(sinTheta);
         double arcCos = Math.acos(cosTheta);
         System.out.println("arcsin : " + arcSin);
-        System.out.println("arccos : " + arcCos);
-        /*
+        System.out.println("arccos : " + arcCos);*/
+ /*
         if (g2 != null) {
             System.out.println("hilight");
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -102,7 +145,7 @@ public class PieMenu extends JComponent {
             g2.setPaint(new GradientPaint(5, 7, Color.WHITE, 400, 7, new Color(187, 210, 247)));
             g2.fillArc(0, 0, widthPie, heigthPie, 0, 90);
         }*/
-    }
+ /*    }
 
     @Override
     public void paint(Graphics g) {
@@ -121,20 +164,45 @@ public class PieMenu extends JComponent {
 
             // Tracer les arcs de cercle 
             g2.setColor(item.getBackground());
-            g2.fillArc(0, 0, widthPie, heigthPie, angle * i, angle);
-
-            //Tracé du cercle
-            int d = widthPie / 2;
+            g2.fillArc(0, 0, widthPie, heigthPie, angle * i, angle); */
+ /*
+            item.draw(g2, widthPie, heigthPie, angle*i, angle);*/
+    //Tracé du cercle
+    /*           int d = widthPie / 2;
             int x = (int) ((widthPie * 1 / 3) * Math.cos(Math.toRadians((-1) * (angle * (2 * i + 1)) / 2)));
             int y = (int) ((d * 2 / 3) * Math.sin(Math.toRadians((-1) * (angle * (2 * i + 1)) / 2)));
             g2.setColor(item.getForeground());
             g2.drawString(item.getText(), x + d, y + d);
         }
 
-    }
-
+    }*/
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(widthPie, heigthPie);
     }
+
+    public void privateaddPropertyChangeListener(String propertyname, PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+
+    public void privateremovePropertyChangeListener(String propertyname, PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
+    }
+
+    public boolean Contains(int x, int y) {
+        double a = getWidth() / 2;
+        double b = getHeight() / 2;
+        double X = x - a;
+        double Y = y - a;
+        return ((X * X) / (a * a) + (Y * Y) / (b * b) <= 1);
+    }
+
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        super.setBounds(x, y, width, height);
+        for (ItemPieMenu item : items) {
+            item.setBounds(0, 0, width, height);           
+        }
+    }
+
 }
