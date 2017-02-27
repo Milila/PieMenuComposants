@@ -1,3 +1,8 @@
 Manifest-Version: 1.0
-X-COMMENT: Main-Class will be added automatically by build
+
+Name: piemenucomposants.ItemPieMenu.java
+Java-Bean: True
+
+Name: piemenucomposants.PieMenu.java
+Java-Bean: True
 
