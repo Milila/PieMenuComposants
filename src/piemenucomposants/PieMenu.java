@@ -48,9 +48,7 @@ public class PieMenu extends JLayeredPane {
         widthPie = 150;
         heigthPie = 150;
         this.setBackground(Color.red);
-        /* this.privateaddPropertyChangeListener(PROPERTY_QUATIER_BACKGROUND_COLOR, (e)-> {
-            firePropertyChange(PROPERTY_QUATIER_BACKGROUND_COLOR, e.getOldValue(), e.getNewValue()); 
-        });*/
+        
         this.privateaddPropertyChangeListener(PROPERTY_NB_QUATIER, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -109,73 +107,6 @@ public class PieMenu extends JLayeredPane {
     public void setyDep(int yDep) {
         this.yDep = yDep;
     }
-
-    /*    public int getWidthPie() {
-        return widthPie;
-    }
-
-    public void setWidthPie(int widthPie) {
-        this.widthPie = widthPie;
-    }
-
-    public int getHeigthPie() {
-        return heigthPie;
-    }
-
-    public void setHeigthPie(int heigthPie) {
-        this.heigthPie = heigthPie;
-    }
-     */
- /*   public void highlightQuartier(int x, int y) {
-        System.out.println("x : " + xDep + "  y : " + yDep);
-        Graphics2D g2 = (Graphics2D) getGraphics();
-        int r = widthPie / 2;
-        double n = Math.sqrt((double) ((x - r) * (x - r) + (y - r) * (y - r)));
-        double sinTheta = (y - r) / n;
-        double cosTheta = (x - r) / n;
-        double arcSin = Math.asin(sinTheta);
-        double arcCos = Math.acos(cosTheta);
-        System.out.println("arcsin : " + arcSin);
-        System.out.println("arccos : " + arcCos);*/
- /*
-        if (g2 != null) {
-            System.out.println("hilight");
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setPaint(new GradientPaint(5, 7, Color.WHITE, 400, 7, new Color(187, 210, 247)));
-            g2.fillArc(0, 0, widthPie, heigthPie, 0, 90);
-        }*/
- /*    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D g2 = (Graphics2D) g;
-        int angle = 360 / items.size();
-
-        //Pour palier au probleme du nombre d'items impairs
-        if (360 % items.size() != 0) {
-            angle++;
-        }
-
-        System.out.println("angle : " + angle);
-        for (int i = 0; i < items.size(); i++) {
-            ItemPieMenu item = items.get(i);
-
-            // Tracer les arcs de cercle 
-            g2.setColor(item.getBackground());
-            g2.fillArc(0, 0, widthPie, heigthPie, angle * i, angle); */
- /*
-            item.draw(g2, widthPie, heigthPie, angle*i, angle);*/
-    //Tracé du cercle
-    /*           int d = widthPie / 2;
-            int x = (int) ((widthPie * 1 / 3) * Math.cos(Math.toRadians((-1) * (angle * (2 * i + 1)) / 2)));
-            int y = (int) ((d * 2 / 3) * Math.sin(Math.toRadians((-1) * (angle * (2 * i + 1)) / 2)));
-            g2.setColor(item.getForeground());
-            g2.drawString(item.getText(), x + d, y + d);
-        }
-
-    }*/
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(widthPie, heigthPie);

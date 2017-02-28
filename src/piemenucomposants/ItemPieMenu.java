@@ -16,6 +16,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
+import sun.security.krb5.internal.KDCOptions;
 
 /**
  *
@@ -32,10 +33,10 @@ public class ItemPieMenu extends JComponent {
     private static final String PROPERTY_NUM_QUARTIER = "numquartier";
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private List<PieMenuListener> itemListeners;
-    
+
     private boolean armed;
-    private int widthPie = 10;
-    private int heigthPie = 10;
+    private int widthPie = 150;
+    private int heigthPie = 150;
     private int num_quartier = 0;
 
     private String text;
@@ -52,11 +53,11 @@ public class ItemPieMenu extends JComponent {
         this.background = b;
         this.foreground = f;
         this.itemListeners = new ArrayList();
-        
+
         this.privateAddPropertyChange(PROPERTY_TEXT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                 repaint();
+                repaint();
             }
         });
         this.privateAddPropertyChange(PROPERTY_BACKGROUND, new PropertyChangeListener() {
@@ -68,7 +69,7 @@ public class ItemPieMenu extends JComponent {
         this.privateAddPropertyChange(PROPERTY_FOREGROUND, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                 repaint();
+                repaint();
             }
         });
         this.privateAddPropertyChange(PROPERTY_HEIGTH, new PropertyChangeListener() {
@@ -89,33 +90,36 @@ public class ItemPieMenu extends JComponent {
                 repaint();
             }
         });
-        
+
         this.addMouseListener(new MouseAdapter() {
             private Color color = getBackground();
 
             @Override
             public void mouseExited(MouseEvent e) {
                 setBackground(color);
+                System.out.println("Exited");
                 //armed = false;
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
                 armed = true;
+                System.out.println("Entered");
+                System.out.println("num_quartier " + getNum_quartier() + " angle : " + angle);
                 setBackground(Color.BLUE.darker());
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 fireItemClicked(new PieMenuEvent(this));
-                System.out.println("CLICK");
+                System.out.println("CLICK " + (getNum_quartier() + 1));
             }
 
         });
-       
+
     }
-    
-     private void fireItemClicked(PieMenuEvent itemEvent) {
+
+    private void fireItemClicked(PieMenuEvent itemEvent) {
         for (PieMenuListener listener : itemListeners) {
             listener.pieMenuMouseDown(itemEvent);
         }
@@ -124,9 +128,8 @@ public class ItemPieMenu extends JComponent {
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
-        System.out.println(widthPie+" "+heigthPie+" "+angle+" "+num_quartier);
+        //System.out.println(widthPie+" "+heigthPie+" "+angle+" "+num_quartier);
         Graphics2D g2 = (Graphics2D) graphics;
-        //g2.setColor(background);
         Color oldColor = graphics.getColor();
         g2.setColor(background);
         g2.fillArc(0, 0, widthPie, heigthPie, angle * num_quartier, angle);
@@ -220,6 +223,30 @@ public class ItemPieMenu extends JComponent {
 
     public void privateRemovePropertyChange(String propertyName, PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        x -= widthPie / 2;
+        y -= widthPie;
+        y = Math.abs(y);
+        y -= widthPie / 2;
+
+        double myAngle = Math.atan2(y, x);
+        if (myAngle < 0) {
+            myAngle = Math.abs(myAngle);
+            myAngle = Math.toDegrees(myAngle);
+            myAngle -= 180;
+            myAngle = Math.abs(myAngle);
+            myAngle += 180;
+        } else {
+            myAngle = Math.toDegrees(myAngle);
+        }
+        if (myAngle > angle * getNum_quartier() && myAngle < angle + angle * getNum_quartier()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
