@@ -112,6 +112,7 @@ public class ItemPieMenu extends JComponent {
             @Override
             public void mouseClicked(MouseEvent e) {
                 fireItemClicked(new PieMenuEvent(this));
+                getParent().setVisible(false);
                 System.out.println("CLICK " + (getNum_quartier() + 1));
             }
 
