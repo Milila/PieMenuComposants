@@ -16,142 +16,198 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
-import sun.security.krb5.internal.KDCOptions;
 
 /**
- *
+ * Item d'un pie menu
+ * Possibilité de changer la couleur de texte, de fond, et de surbrillance
+ * Possibilité de changer le texte
+ * Angle variable en fonction du nombre d'items dans le pie menu
  * @author cannacan
  */
 public class ItemPieMenu extends JComponent {
-
-    //IL MANQUE LES ACTIONS ASSOCIEES A CHAQUE ITEM!!!
+    /**
+     * Propriétés de l'item du PieMenu : le texte affiché, la couleur de fond,
+     * la couleur du texte, la valeur de l'angle, le numéro du quartier dans 
+     * le piemenu et la couleur en surbrillance de l'item/quartier.
+     */
     private static final String PROPERTY_TEXT = "text";
     private static final String PROPERTY_BACKGROUND = "background";
     private static final String PROPERTY_FOREGROUND = "foreground";
-    private static final String PROPERTY_WIDTH = "width";
-    private static final String PROPERTY_HEIGTH = "heigth";
+    private static final String PROPERTY_ANGLE = "angle";
     private static final String PROPERTY_NUM_QUARTIER = "numquartier";
-    private PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private static final String PROPERTY_BACKGROUND_HIGHLIGHT = "backgroundhighlight";
+    private PropertyChangeSupport support;
     private List<PieMenuListener> itemListeners;
 
-    private boolean armed;
-    private int widthPie = 150;
-    private int heigthPie = 150;
+    /**
+     * Taille du PieMenu associé à l'item.
+     */
+    private int widthPie;
+    private int heigthPie;
+    
+    /**
+     * Variables associées aux propriétés de l'item.
+     */
     private int num_quartier = 0;
-
     private String text;
     private Color background;
     private Color foreground;
+    private Color highlightBackground;
     private int angle;
 
+    /**
+     * Constructeur sans paramètres.
+     */
     public ItemPieMenu() {
         this("", Color.BLACK, Color.BLUE);
     }
 
+    /**
+     * Constructeur de l'item.
+     * @param t
+     * Texte à afficher dans l'item.
+     * @param b
+     * Couleur de l'item.
+     * @param f 
+     * Couleur du texte.
+     */
     public ItemPieMenu(String t, Color b, Color f) {
         this.text = t;
         this.background = b;
+        this.highlightBackground = new Color(background.getRed(), background.getGreen(), background.getBlue(), 50);
         this.foreground = f;
         this.itemListeners = new ArrayList();
+        this.support = new PropertyChangeSupport(this);
 
-        this.privateAddPropertyChange(PROPERTY_TEXT, new PropertyChangeListener() {
+        //Repeindre le composant lorsqu'une propriété est modifiée.
+        this.privateAddPropertyChangeListener(PROPERTY_TEXT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
-        this.privateAddPropertyChange(PROPERTY_BACKGROUND, new PropertyChangeListener() {
+        this.privateAddPropertyChangeListener(PROPERTY_BACKGROUND, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
-        this.privateAddPropertyChange(PROPERTY_FOREGROUND, new PropertyChangeListener() {
+        this.privateAddPropertyChangeListener(PROPERTY_BACKGROUND_HIGHLIGHT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
-        this.privateAddPropertyChange(PROPERTY_HEIGTH, new PropertyChangeListener() {
+        this.privateAddPropertyChangeListener(PROPERTY_FOREGROUND, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
-        this.privateAddPropertyChange(PROPERTY_NUM_QUARTIER, new PropertyChangeListener() {
+        this.privateAddPropertyChangeListener(PROPERTY_ANGLE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
-        this.privateAddPropertyChange(PROPERTY_WIDTH, new PropertyChangeListener() {
+        this.privateAddPropertyChangeListener(PROPERTY_NUM_QUARTIER, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 repaint();
             }
         });
 
+        /**
+         * Comportement de l'item : highlight quand on entre la souris, couleur 
+         * de base quand la souris quitte l'item et appel aux listeners associés
+         * à mouseEntered, mouseExited et mouseClicked.
+        */
         this.addMouseListener(new MouseAdapter() {
             private Color color = getBackground();
 
             @Override
             public void mouseExited(MouseEvent e) {
                 setBackground(color);
-                System.out.println("Exited");
-                //armed = false;
+                fireItemExited(new PieMenuEvent(this));
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                armed = true;
-                System.out.println("Entered");
-                System.out.println("num_quartier " + getNum_quartier() + " angle : " + angle);
-                setBackground(Color.BLUE.darker());
+                setBackground(highlightBackground);
+                fireItemEntered(new PieMenuEvent(this));
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 fireItemClicked(new PieMenuEvent(this));
                 getParent().setVisible(false);
-                System.out.println("CLICK " + (getNum_quartier() + 1));
             }
 
         });
 
     }
 
-    private void fireItemClicked(PieMenuEvent itemEvent) {
+    /**
+     * Déclenchement des actions associées à mouseEntered.
+     * @param itemEvent 
+     * Evenement PieMenu.
+     */
+    private synchronized void fireItemEntered(PieMenuEvent itemEvent) {
         for (PieMenuListener listener : itemListeners) {
-            listener.pieMenuMouseDown(itemEvent);
+            listener.pieMenuEntered(itemEvent);
+        }
+    }
+    
+    /**
+     * Déclenchement des actions associées à mouseExited.
+     * @param itemEvent 
+     * Evenement PieMenu.
+     */
+    private synchronized void fireItemExited(PieMenuEvent itemEvent) {
+        for (PieMenuListener listener : itemListeners) {
+            listener.pieMenuExited(itemEvent);
+        }
+    }
+    
+    /**
+     * Déclenchement des actions associées à mouseClicked.
+     * @param itemEvent 
+     * Evenement PieMenu.
+     */
+    private synchronized void fireItemClicked(PieMenuEvent itemEvent) {
+        for (PieMenuListener listener : itemListeners) {
+            listener.pieMenuClick(itemEvent);
         }
     }
 
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
-        //System.out.println(widthPie+" "+heigthPie+" "+angle+" "+num_quartier);
+
         Graphics2D g2 = (Graphics2D) graphics;
         Color oldColor = graphics.getColor();
         g2.setColor(background);
         g2.fillArc(0, 0, widthPie, heigthPie, angle * num_quartier, angle);
 
-        //Tracé du cercle
+        //Tracé de l'arc de cercle
         int d = widthPie / 2;
         int x = (int) ((widthPie * 1 / 3) * Math.cos(Math.toRadians((-1) * (angle * (2 * num_quartier + 1)) / 2)));
         int y = (int) ((d * 2 / 3) * Math.sin(Math.toRadians((-1) * (angle * (2 * num_quartier + 1)) / 2)));
+        //Tracé du label
         g2.setColor(foreground);
         g2.drawString(text, x + d, y + d);
         g2.setColor(oldColor);
     }
 
+    /**
+     * Getter et Setter des variables.
+     */
     public int getWidthPie() {
         return widthPie;
     }
 
     public void setWidthPie(int widthPie) {
-        int oldWidth = this.widthPie;
         this.widthPie = widthPie;
-        support.firePropertyChange(PROPERTY_WIDTH, oldWidth, widthPie);
     }
 
     public int getHeigthPie() {
@@ -159,25 +215,25 @@ public class ItemPieMenu extends JComponent {
     }
 
     public void setHeigthPie(int heigthPie) {
-        int oldHeigth = this.heigthPie;
         this.heigthPie = heigthPie;
-        support.firePropertyChange(PROPERTY_HEIGTH, oldHeigth, heigthPie);
     }
 
     public int getNum_quartier() {
         return num_quartier;
     }
 
-    /*
-    public void draw(Graphics2D g2, int widthPie, int heigthPie, int depangle, int endangle) {
-    g2.setColor(background);
-    g2.fillArc(0, 0, widthPie, heigthPie, depangle, endangle);   
-    }
-     */
     public void setNum_quartier(int num_quartier) {
         int oldNum_quartier = this.num_quartier;
         this.num_quartier = num_quartier;
         support.firePropertyChange(PROPERTY_NUM_QUARTIER, oldNum_quartier, this.num_quartier);
+    }
+
+    public Color getHighlightBackground() {
+        return highlightBackground;
+    }
+
+    public void setHighlightBackground(Color highlightBackground) {
+        this.highlightBackground = highlightBackground;
     }
 
     public void setText(String t) {
@@ -215,39 +271,59 @@ public class ItemPieMenu extends JComponent {
     }
 
     public void setAngle(int angle) {
+        int oldAngle = this.angle;
         this.angle = angle;
+        support.firePropertyChange(PROPERTY_ANGLE, oldAngle, this.angle);
     }
-
-    public void privateAddPropertyChange(String propertyName, PropertyChangeListener listener) {
+    
+    public void privateAddPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 
-    public void privateRemovePropertyChange(String propertyName, PropertyChangeListener listener) {
+    public void privateRemovePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
+    }
+    
+    @Override
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        privateAddPropertyChangeListener(propertyName, listener);
     }
 
     @Override
     public boolean contains(int x, int y) {
-        x -= widthPie / 2;
+        //On se place au centre du cercle
+        int rayon = widthPie/2;
+        x = x - rayon;
         y -= widthPie;
         y = Math.abs(y);
-        y -= widthPie / 2;
+        y = y - rayon;
 
-        double myAngle = Math.atan2(y, x);
-        if (myAngle < 0) {
-            myAngle = Math.abs(myAngle);
-            myAngle = Math.toDegrees(myAngle);
-            myAngle -= 180;
-            myAngle = Math.abs(myAngle);
-            myAngle += 180;
+        //On calcule l'angle dans forme entre ces deux coordonnees
+        double nouvelAngle = Math.atan2(y, x);
+        if (nouvelAngle < 0) {
+            nouvelAngle = Math.abs(nouvelAngle);
+            nouvelAngle = Math.toDegrees(nouvelAngle);
+            nouvelAngle -= 180;
+            nouvelAngle = Math.abs(nouvelAngle);
+            nouvelAngle += 180;
         } else {
-            myAngle = Math.toDegrees(myAngle);
+            nouvelAngle = Math.toDegrees(nouvelAngle);
         }
-        if (myAngle > angle * getNum_quartier() && myAngle < angle + angle * getNum_quartier()) {
+        //Si notre angle obtenu est compris entre l'angle de départ, et l'angle de départ + un angle complet, on est dedans
+        if (nouvelAngle > angle * getNum_quartier() && nouvelAngle < angle + angle * getNum_quartier()) {
             return true;
         } else {
             return false;
         }
     }
 
+     public void addItemListener(PieMenuListener listener) {
+        itemListeners.add(listener);
+    }
+
+    public void removeItemListener(PieMenuListener listener) {
+        itemListeners.remove(listener);
+    }
+
+    
 }

@@ -11,11 +11,10 @@ package piemenucomposants;
  */
 public interface PieMenuListener {
 
-    void pieMenuMouseMove(PieMenuEvent evt);
+    void pieMenuClick(PieMenuEvent evt);
 
-    void pieMenuMouseDown(PieMenuEvent evt);
+    void pieMenuEntered(PieMenuEvent evt);
     
-    void pieMenuMouseUp(PieMenuEvent evt);
+    void pieMenuExited(PieMenuEvent evt);
     
-    void pieMenuTick(PieMenuEvent evt);
 }
